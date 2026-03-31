@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Quiz Bridge</title>
+<style>
+  body { font-family: Arial; text-align: center; padding: 30px; }
+  button { margin: 5px; padding: 10px 15px; font-size: 16px; }
+  #mano { font-size: 20px; margin: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Quiz Bridge</h1>
+
+<div id="mano"></div>
+
+<div>
+  <button onclick="risposta('1C')">1♣</button>
+  <button onclick="risposta('1D')">1♦</button>
+  <button onclick="risposta('1NT')">1NT</button>
+</div>
+
+<p id="risultato"></p>
+
+<button onclick="nuovaMano()">Nuova mano</button>
+
+<script>
+// carte e valori
+const semi = ["♠", "♥", "♦", "♣"];
+const valori = [
+  {c:"A", p:4}, {c:"K", p:3}, {c:"Q", p:2}, {c:"J", p:1},
+  {c:"10", p:0}, {c:"9", p:0}, {c:"8", p:0},
+  {c:"7", p:0}, {c:"6", p:0}, {c:"5", p:0},
+  {c:"4", p:0}, {c:"3", p:0}, {c:"2", p:0}
+];
+
+let manoCorrente = [];
+let rispostaCorretta = "";
+
+// genera mano casuale con almeno 12 punti
+function generaMano() {
+  let mano, punti;
+
+  do {
+    let mazzo = [];
+
+    semi.forEach(s => {
+      valori.forEach(v => {
+        mazzo.push({...v, seme: s});
+      });
+    });
+
+    mazzo.sort(() => Math.random() - 0.5);
+    mano = mazzo.slice(0,13);
+
+    punti = mano.reduce((tot, carta) => tot + carta.p, 0);
+
+  } while (punti < 12);
+
+  return {mano, punti};
+}
+
+// controlla bilanciata (molto semplice)
+function èBilanciata(mano) {
+  let distribuzione = { "♠":0, "♥":0, "♦":0, "♣":0 };
+
+  mano.forEach(c => distribuzione[c.seme]++);
+
+  let valori = Object.values(distribuzione);
+
+  return !valori.includes(0) && Math.max(...valori) <= 5;
+}
+
+// decide apertura (logica base)
+function calcolaRisposta(mano, punti) {
+  if (punti >= 15 && punti <= 17 && èBilanciata(mano)) {
+    return "1NT";
+  }
+  return "1C";
+}
+
+// stampa mano
+function mostraMano(mano, punti) {
+  let html = "";
+
+  semi.forEach(s => {
+    let carte = mano
+      .filter(c => c.seme === s)
+      .map(c => c.c)
+      .join(" ");
+
+    html += `<div>${s}: ${carte}</div>`;
+  });
+
+  html += `<p>Punti: ${punti}</p>`;
+
+  document.getElementById("mano").innerHTML = html;
+}
+
+// feedback casuale
+const feedbackPositivi = ["Bravo! 🎉", "Corretto! 👍", "Ottimo! 😄"];
+const feedbackNegativi = ["Sbagliato 😅", "Riprova! ❌", "Nope 😬"];
+
+function risposta(scelta) {
+  let msg;
+
+  if (scelta === rispostaCorretta) {
+    msg = feedbackPositivi[Math.floor(Math.random()*feedbackPositivi.length)];
+  } else {
+    msg = feedbackNegativi[Math.floor(Math.random()*feedbackNegativi.length)];
+  }
+
+  document.getElementById("risultato").innerText = msg;
+}
+
+// nuova mano
+function nuovaMano() {
+  let {mano, punti} = generaMano();
+
+  manoCorrente = mano;
+  rispostaCorretta = calcolaRisposta(mano, punti);
+
+  mostraMano(mano, punti);
+  document.getElementById("risultato").innerText = "";
+}
+
+// avvio
+nuovaMano();
+</script>
+
+</body>
+</html>

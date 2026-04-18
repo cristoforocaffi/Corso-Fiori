@@ -4,9 +4,56 @@
 <meta charset="UTF-8">
 <title>Quiz Bridge</title>
 <style>
-  body { font-family: Arial; text-align: center; padding: 30px; }
+  body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 30px;
+  
+  /* sfondo verde tipo tavolo */
+  background: radial-gradient(circle, #0b5d2a, #063d1a);
+  color: white;
+}
   button { margin: 5px; padding: 10px 15px; font-size: 16px; }
-  #mano { font-size: 20px; margin: 20px; }
+  #mano {
+  background: white;
+  color: black;
+  display: inline-block;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  margin: 20px;
+}
+  .riga-mano {
+  font-family: monospace;
+  font-size: 20px;
+  text-align: left;
+}
+
+.mano {
+  margin: 0 auto;
+  font-size: 20px;
+  border-collapse: collapse;
+}
+
+.mano td {
+  padding: 4px 8px;
+}
+
+.seme {
+  width: 30px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.seme:contains("♥"),
+.seme:contains("♦") {
+  color: red;
+}
+
+.carte {
+  text-align: left;
+  font-family: monospace;
+}
 </style>
 </head>
 <body>
@@ -16,9 +63,20 @@
 <div id="mano"></div>
 
 <div>
+  <div>
   <button onclick="risposta('1C')">1♣</button>
   <button onclick="risposta('1D')">1♦</button>
+  <button onclick="risposta('1H')">1♥</button>
+  <button onclick="risposta('1S')">1♠</button>
   <button onclick="risposta('1NT')">1NT</button>
+  </div>
+  <div>
+  <button onclick="risposta('2C')">2♣</button>
+  <button onclick="risposta('2D')">2♦</button>
+  <button onclick="risposta('2H')">2♥</button>
+  <button onclick="risposta('2S')">2♠</button>
+  <button onclick="risposta('2NT')">2NT</button>
+  </div>
 </div>
 
 <p id="risultato"></p>
@@ -37,6 +95,7 @@ const valori = [
 
 let manoCorrente = [];
 let rispostaCorretta = "";
+const ordineValori = ["A","K","Q","J","10","9","8","7","6","5","4","3","2"];
 
 // genera mano casuale con almeno 12 punti
 function generaMano() {
@@ -61,39 +120,94 @@ function generaMano() {
   return {mano, punti};
 }
 
-// controlla bilanciata (molto semplice)
-function èBilanciata(mano) {
+function calcolaDistribuzione(mano) {
   let distribuzione = { "♠":0, "♥":0, "♦":0, "♣":0 };
 
-  mano.forEach(c => distribuzione[c.seme]++);
+  mano.forEach(carta => {
+    distribuzione[carta.seme]++;
+  });
 
+  // prendi solo i numeri e ordinali decrescenti
   let valori = Object.values(distribuzione);
+  valori.sort((a, b) => b - a);
 
-  return !valori.includes(0) && Math.max(...valori) <= 5;
+  return valori.join("-");
+}
+
+function contaSeme(mano, seme) {
+  return mano.filter(c => c.seme === seme).length;
+}
+
+// controlla bilanciata (molto semplice)
+function èBilanciata(mano) {
+  let distribuzione = calcolaDistribuzione(mano);
+  let ordDistribuzione = distribuzione.split("-").map(Number).sort((a, b) => b - a);
+  let stringDistribuzione = JSON.stringify(ordDistribuzione);
+  return stringDistribuzione === JSON.stringify([4,4,3,2]) || stringDistribuzione === JSON.stringify([4,3,3,3]) || stringDistribuzione === JSON.stringify([5,3,3,2]);
 }
 
 // decide apertura (logica base)
 function calcolaRisposta(mano, punti) {
+  let nspades = contaSeme(mano, "♠");
+  let nhearts = contaSeme(mano, "♥");
+  let ndiamonds = contaSeme(mano, "♦");
+  let nclubs = contaSeme(mano, "♣");
   if (punti >= 15 && punti <= 17 && èBilanciata(mano)) {
     return "1NT";
   }
-  return "1C";
+  if (punti >= 12 && punti <= 20) { 
+    if (nspades == Math.max(nspades,nclubs,nhearts,ndiamonds) && nspades >4) {
+      return "1S";
+    }
+    if (nhearts == Math.max(nclubs,nhearts,ndiamonds) && nhearts >4) {
+      return "1H";
+    }
+    if (ndiamonds == Math.max(ndiamonds,nclubs) && ndiamonds >3) {
+      return "1D";
+    }
+    return "1C";
+  }
+ if (punti >= 21 && punti <= 23 && èBilanciata(mano)) {
+    return "1NT";
 }
-
+if (punti >= 24 && èBilanciata(mano)) {
+    return "2C";
+}
+if (punti >= 21) { 
+    if (nspades == Math.max(nspades,nclubs,nhearts,ndiamonds) && nspades >4) {
+      return "2S";
+    }
+    if (nhearts == Math.max(nclubs,nhearts,ndiamonds) && nhearts >4) {
+      return "2H";
+    }
+    if (ndiamonds == Math.max(ndiamonds.nclubs) && ndiamonds >3) {
+      return "2D";
+    }
+    return "2C";
+  }
+}
 // stampa mano
 function mostraMano(mano, punti) {
-  let html = "";
+  let html = "<table class='mano'>";
 
   semi.forEach(s => {
     let carte = mano
       .filter(c => c.seme === s)
+      .sort((a, b) => ordineValori.indexOf(a.c) - ordineValori.indexOf(b.c))
       .map(c => c.c)
       .join(" ");
 
-    html += `<div>${s}: ${carte}</div>`;
+    html += `
+      <tr>
+        <td class="seme">${s}</td>
+        <td class="carte">${carte}</td>
+      </tr>
+    `;
   });
 
-  html += `<p>Punti: ${punti}</p>`;
+  html += "</table>";
+
+  // html += `<p>Punti: ${punti}</p>`;
 
   document.getElementById("mano").innerHTML = html;
 }

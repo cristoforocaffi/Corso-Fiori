@@ -69,7 +69,7 @@
 </head>
 <body>
 
-<h1>Quiz Bridge</h1>
+<h1>Come apri?</h1>
 
 <div id="mano"></div>
 
@@ -230,21 +230,25 @@ const gifPositive = [
   "gif/very_good.gif",
   "gif/very_good_2.gif",
   "gif/obama.gif",
-  "gif/einstein.gif"
+  "gif/einstein.gif",
+  "gif/scimmia.gif",
+  "gif/frank_j.gif"
 ];
 
 const gifNegative = [
   "gif/gif_pinguino.gif",
   "gif/no.gif",
   "gif/tom_jerry.gif",
-  "gif/pappagallo_no.gif"
+  "gif/pappagallo_no.gif",
+  "gif/whiskyno.gif",
+  "gif/theoffice_no.gif"
 ];
 
 function risposta(scelta) {
   let corretto = scelta === rispostaCorretta;
 
-  // probabilità: 0,1,2,3 → 1 su 4 = gif
-  let usaGif = Math.floor(Math.random() * 2) === 0;
+  // probabilità 2 su 3 = gif
+  let usaGif = !(Math.floor(Math.random() * 3) === 0);
 
   let output = "";
 

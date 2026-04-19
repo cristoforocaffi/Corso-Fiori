@@ -5,15 +5,22 @@
 <title>Apertura</title>
 <style>
   body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 30px;
-  
-  /* sfondo verde tipo tavolo */
+
   background: radial-gradient(circle, #0b5d2a, #063d1a);
   color: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
 }
-  button { margin: 5px; padding: 10px 15px; font-size: 16px; }
+  button { margin: 5px; padding: 14px; font-size: 18px; }
+  h1 {
+  font-size: 24px;
+}
   #mano {
   background: white;
   color: black;
@@ -22,6 +29,7 @@
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0,0,0,0.5);
   margin: 20px;
+  font-size: 18px;
 }
   .riga-mano {
   font-family: monospace;
@@ -54,6 +62,20 @@
   text-align: left;
   font-family: monospace;
 }
+
+.container {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.bottoni {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
 .feedback-img {
   margin-top: 10px;
   width: 120px;
@@ -67,8 +89,9 @@
 }
 </style>
 </head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <body>
-
+<div class="container">
 <h1>Come apri?</h1>
 
 <div id="mano"></div>
@@ -93,7 +116,7 @@
 <p id="risultato"></p>
 
 <button onclick="nuovaMano()">Nuova mano</button>
-
+</div>
 <script>
 // carte e valori
 const semi = ["♠", "♥", "♦", "♣"];

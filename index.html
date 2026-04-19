@@ -48,17 +48,28 @@
 .seme:contains("♥"),
 .seme:contains("♦") {
   color: red;
-}
+} 
 
 .carte {
   text-align: left;
   font-family: monospace;
 }
+.feedback-img {
+  margin-top: 10px;
+  width: 120px;
+  border-radius: 10px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
 </style>
 </head>
 <body>
 
-<h1>Quiz Bridge</h1>
+<h1>Come Apri?</h1>
 
 <div id="mano"></div>
 
@@ -213,19 +224,38 @@ function mostraMano(mano, punti) {
 }
 
 // feedback casuale
-const feedbackPositivi = ["Bravo! 🎉", "Corretto! 👍", "Ottimo! 😄"];
+const feedbackPositivi = ["Bravo! 🎉", "Corretto! 👍", "Ottimo! 😄",];
 const feedbackNegativi = ["Sbagliato 😅", "Riprova! ❌", "Nope 😬"];
+const gifPositive = [
+  "gif/very_good.gif",
+];
+
+const gifNegative = [
+  "gif/gif_pinguino.gif",
+];
 
 function risposta(scelta) {
-  let msg;
+  let corretto = scelta === rispostaCorretta;
 
-  if (scelta === rispostaCorretta) {
-    msg = feedbackPositivi[Math.floor(Math.random()*feedbackPositivi.length)];
+  // probabilità: 0,1,2,3 → 1 su 4 = gif
+  let usaGif = Math.floor(Math.random() * 4) === 0;
+
+  let output = "";
+
+  if (usaGif) {
+    let gifArray = corretto ? gifPositive : gifNegative;
+    let gif = gifArray[Math.floor(Math.random() * gifArray.length)];
+
+    output = `<img src="${gif}" class="feedback-img">`;
+
   } else {
-    msg = feedbackNegativi[Math.floor(Math.random()*feedbackNegativi.length)];
+    let msgArray = corretto ? feedbackPositivi : feedbackNegativi;
+    let msg = msgArray[Math.floor(Math.random() * msgArray.length)];
+
+    output = `<div>${msg}</div>`;
   }
 
-  document.getElementById("risultato").innerText = msg;
+  document.getElementById("risultato").innerHTML = output;
 }
 
 // nuova mano

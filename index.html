@@ -214,7 +214,7 @@ if (punti >= 21) {
     if (nhearts == Math.max(nclubs,nhearts,ndiamonds) && nhearts >4) {
       return "2H";
     }
-    if (ndiamonds == Math.max(ndiamonds.nclubs) && ndiamonds >3) {
+    if (ndiamonds == Math.max(ndiamonds,nclubs) && ndiamonds >3) {
       return "2D";
     }
     return "2C";
